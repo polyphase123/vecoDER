@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VECO DER Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.35rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+            background: #fdfdfd;
+        }
+
+        .input-group input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .tab-btn {
+            padding: 0.6rem 1.2rem;
+            font-weight: 700;
+            font-size: 0.8rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .tab-btn.active {
+            background: #1e293b;
+            color: white;
+        }
+
+        .meralco-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .meralco-table th {
+            font-size: 0.65rem;
+            font-weight: 900;
+            color: #64748b;
+            text-transform: uppercase;
+            border-bottom: 2px solid #f1f5f9;
+            padding: 0.75rem 0.5rem;
+            text-align: right;
+        }
+
+        .meralco-table th:first-child {
+            text-align: left;
+        }
+
+        .meralco-table td {
+            font-size: 0.75rem;
+            padding: 0.5rem;
+            border-bottom: 1px solid #f8fafc;
+            color: #475569;
+            text-align: right;
+        }
+
+        .meralco-table td:first-child {
+            text-align: left;
+        }
+
+        .section-header-row td {
+            background-color: #f8fafc;
+            font-weight: 800;
+            color: #1e293b;
+            font-size: 0.8rem;
+        }
+
+        .section-header-red td {
+            color: #dc2626 !important;
+        }
+
+        .section-header-blue td {
+            color: #2563eb !important;
+        }
+
+        .row-yellow-highlight {
+            background-color: #fff9c4 !important;
+        }
+
+        .export-row-standard {
+            background-color: #ecfdf5 !important;
+            color: #065f46 !important;
+            font-weight: 900 !important;
+            border-left: 4px solid #10b981 !important;
+        }
+
+        .export-row-standard td {
+            color: #065f46 !important;
+            border-bottom-color: #d1fae5 !important;
+        }
+
+        .actual-kwh-highlight {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .permit-item {
+            border-left: 2px solid #e2e8f0;
+            padding-left: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .advisory-box {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .info-pill {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .gov-sub-header {
+            font-size: 11px;
+            font-weight: 900;
+            color: #1e293b;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            display: block;
+            border-left: 3px solid #3b82f6;
+            padding-left: 0.75rem;
+        }
+
+        .roadmap-step {
+            position: relative;
+            padding-left: 2.5rem;
+            border-left: 2px solid #e2e8f0;
+            padding-bottom: 2rem;
+        }
+
+        .roadmap-step:last-child {
+            border-left-color: transparent;
+            padding-bottom: 0;
+        }
+
+        .roadmap-step::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 0;
+            height: 18px;
+            width: 18px;
+            background: white;
+            border: 3px solid #3b82f6;
+            border-radius: 9999px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .comp-col {
+            @apply p-4 rounded-xl border border-slate-100 flex flex-col;
+        }
+
+        .comp-label {
+            @apply text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1;
+        }
+
+        .comp-val {
+            @apply text-base font-black text-slate-900;
+        }
+
+        .gov-card {
+            @apply bg-white p-6 rounded-xl border border-slate-200 shadow-sm;
+        }
+
+        .gov-title {
+            @apply text-lg font-black text-slate-800 uppercase tracking-tight mb-4 flex items-center gap-2;
+        }
+
+        .gov-text {
+            @apply text-xs leading-relaxed text-slate-600 mb-4;
+        }
+
+        .gov-list {
+            @apply list-none space-y-2 mt-4;
+        }
+
+        .gov-list li {
+            @apply text-xs text-slate-600 flex items-start gap-2;
+        }
+
+        .gov-list li::before {
+            content: '•';
+            @apply text-blue-500 font-bold;
+        }
+
+        /* Styles for Editable Inputs in Table */
+        .table-input {
+            width: 100%;
+            max-width: 80px;
+            background: transparent;
+            border-bottom: 1px dashed #cbd5e1;
+            text-align: right;
+            font-weight: 700;
+            color: #475569;
+            outline: none;
+            padding: 2px 0;
+            transition: all 0.2s;
+        }
+
+        .table-input:focus {
+            border-bottom: 2px solid #2563eb;
+            color: #1e293b;
+        }
+
+        .table-input.pct-input {
+            max-width: 50px;
+        }
+
+        /* Print formatting */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .card {
+                border: 1px solid #eee !important;
+                box-shadow: none !important;
+                margin-bottom: 20px !important;
+                break-inside: avoid;
+            }
+
+            .max-w-7xl {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+            }
+
+            #tab-bill-content,
+            #tab-analytics-content {
+                display: block !important;
+            }
+
+            .lg\:col-span-3 {
+                display: none !important;
+            }
+
+            .lg\:col-span-9,
+            .lg\:col-span-12 {
+                width: 100% !important;
+            }
+
+            .actual-kwh-highlight {
+                border: 1px solid #blue-200 !important;
+            }
+
+            .meralco-table th,
+            .meralco-table td {
+                font-size: 10px !important;
+            }
+
+            .pricing-hero {
+                font-size: 48px !important;
+            }
+
+            .table-input {
+                border: none !important;
+                text-align: right;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body class="p-4 lg:p-8" id="main-body">
+
+    <!-- Selection Modal -->
+    <div id="selection-modal"
+        class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl border border-white/20 relative">
+            <button id="modal-close-btn" onclick="document.getElementById('selection-modal').classList.add('hidden')"
+                class="absolute top-6 right-6 p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-400 hover:text-slate-600 hidden">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-black text-slate-900 mb-2 uppercase tracking-tight italic">VECO <span
+                        class="not-italic text-blue-600">DER SIMULATOR</span></h2>
+                <div class="space-y-1">
+                    <p class="text-[11px] font-black text-blue-600 uppercase tracking-widest italic">Customer category
+                        is in the VECO Bill</p>
+                    <p class="text-sm text-slate-500 font-medium tracking-tight">Select customer category to initialize
+                        December 2025 Rates</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button onclick="selectType('General Service')"
+                    class="p-6 rounded-2xl border-2 border-slate-100 hover:border-blue-500 hover:bg-blue-50 transition-all text-left group">
+                    <span
+                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 group-hover:text-blue-500">Low
+                        Voltage</span>
+                    <span class="block text-lg font-black text-slate-800">General Service</span>
+                    <p class="text-[10px] text-slate-400 mt-2 font-medium">Standard residential/commercial</p>
+                </button>
+                <button onclick="selectType('General Power')"
+                    class="p-6 rounded-2xl border-2 border-slate-100 hover:border-blue-500 hover:bg-blue-50 transition-all text-left group">
+                    <span
+                        class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 group-hover:text-blue-500">Medium
+                        Voltage</span>
+                    <span class="block text-lg font-black text-slate-800">General Power</span>
+                    <p class="text-[10px] text-slate-400 mt-2 font-medium">Commercial & Light Industrial</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="max-w-7xl mx-auto space-y-6">
+
+        <!-- Header -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 no-print">
+            <div>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight italic uppercase">VECO DER <span
+                        class="not-italic text-slate-500 font-medium tracking-normal">SIMULATOR</span></h1>
+                <div class="flex items-center gap-3 mt-1">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                        Dec 2025 Schedule • <span id="client-type-label" class="text-blue-600">Selecting...</span>
+                    </p>
+                    <button onclick="document.getElementById('selection-modal').classList.remove('hidden')"
+                        class="text-[9px] font-black bg-white text-blue-600 border border-blue-200 px-2 py-0.5 rounded-full hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all uppercase tracking-widest flex items-center gap-1 shadow-sm">
+                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path>
+                        </svg>
+                        Change Type
+                    </button>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <div class="flex bg-white p-1 rounded-xl shadow-sm border border-slate-200">
+                    <button onclick="switchTab('bill')" id="btn-bill" class="tab-btn active">Itemized Bill</button>
+                    <button onclick="switchTab('analytics')" id="btn-analytics" class="tab-btn text-slate-500">Analytics
+                        & Comparison</button>
+                    <button onclick="switchTab('flow')" id="btn-flow" class="tab-btn text-slate-500">Governance &
+                        Roadmap</button>
+                </div>
+                <!-- Print Button Removed -->
+            </div>
+        </div>
+
+        <!-- TAB 1: BILLING SIMULATOR -->
+        <div id="tab-bill-content" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-3 space-y-4 no-print">
+                <div class="card p-5 bg-slate-50/50">
+                    <h2 class="text-[10px] font-black text-slate-900 mb-4 uppercase tracking-widest">Input Parameters
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="input-group">
+                            <label>Exporting DER Capacity (kWp)</label>
+                            <input type="number" id="derCapacityKWp" value="450" max="1000"
+                                oninput="validateAndCalculate()">
+                            <p class="text-[8px] text-red-500 font-bold mt-1 hidden" id="cap-warning">Max capacity is
+                                1000 kWp</p>
+                        </div>
+                        <div class="input-group">
+                            <label>Solar Capacity Factor (%)</label>
+                            <input type="number" id="capacityFactor" value="18" step="0.1" oninput="calculateBill()">
+                        </div>
+                        <div class="input-group">
+                            <label>Grid Import (kWh)</label>
+                            <input type="number" id="importKwh" value="97800" oninput="calculateBill()">
+                        </div>
+                        <div class="input-group">
+                            <label class="flex flex-col">
+                                <span class="flex justify-between items-center">
+                                    Solar Export (kWh)
+                                    <span class="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-black"
+                                        id="label-export-limit">Limit: 0</span>
+                                </span>
+                                <span class="text-[8px] text-slate-400 normal-case font-bold mt-1">Note: Excess beyond
+                                    30% uncompensated.</span>
+                            </label>
+                            <input type="number" id="exportKwh" value="5000" oninput="calculateBill()">
+                        </div>
+                        <div class="input-group">
+                            <label>Billed Demand (kW)</label>
+                            <input type="number" id="demandKw" value="405" oninput="calculateBill()">
+                        </div>
+                        <div class="input-group">
+                            <label>Power Factor (%)</label>
+                            <input type="number" id="powerFactor" value="98.84" step="0.01" oninput="calculateBill()">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sideStatusCard"
+                    class="card p-5 bg-slate-900 text-white shadow-lg transition-colors duration-300">
+                    <div class="flex justify-between items-start mb-1">
+                        <p class="text-[10px] font-black uppercase opacity-60 tracking-widest">Amount Payable</p>
+                        <span id="sideRejectionBadge" class="hidden badge-rejected uppercase">CAPPED</span>
+                    </div>
+                    <h2 class="text-3xl font-black tracking-tighter" id="sideTotal">₱ 0.00</h2>
+                    <div class="mt-4 pt-4 border-t border-white/10">
+                        <p class="text-[9px] font-bold uppercase opacity-60 text-emerald-400">REC Meter Mandatory</p>
+                        <p class="text-[8px] font-bold uppercase opacity-50">No DSM Charges Applied</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-9 space-y-6">
+                <!-- Actual Consumption Breakdown -->
+                <div class="actual-kwh-highlight" id="actual-cons-box">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-xs font-black text-blue-900 uppercase tracking-widest">Actual Consumption Volume
+                            (kWh)</h3>
+                        <span
+                            class="text-[9px] font-black bg-blue-600 text-white px-2 py-0.5 rounded uppercase tracking-tighter">Mandatory
+                            REC Volume</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center mb-4 text-center md:text-left">
+                        <div class="bg-white p-3 rounded-lg border border-blue-100">
+                            <p class="text-[9px] text-slate-400 font-black uppercase mb-1">Grid Import</p>
+                            <p class="text-lg font-bold text-slate-800" id="math-import">97,800</p>
+                        </div>
+                        <div class="font-bold text-blue-400 italic text-center">minus</div>
+                        <div class="bg-white p-3 rounded-lg border border-blue-100">
+                            <p class="text-[9px] text-slate-400 font-black uppercase mb-1">Solar Export</p>
+                            <p class="text-lg font-bold text-slate-800" id="math-export">5,000</p>
+                        </div>
+                        <div class="font-bold text-blue-400 md:hidden text-center">plus</div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center text-center md:text-left">
+                        <div class="bg-white p-3 rounded-lg border border-blue-100">
+                            <p class="text-[9px] text-slate-400 font-black uppercase mb-1">Solar Generated</p>
+                            <p class="text-lg font-bold text-slate-800" id="math-gen">60,264</p>
+                        </div>
+                        <div class="font-bold text-blue-400 italic text-center">equals</div>
+                        <div class="bg-blue-600 p-3 rounded-lg col-span-1 md:col-span-2 shadow-sm">
+                            <p class="text-[9px] text-blue-100 font-black uppercase mb-1">Total Billing Base</p>
+                            <p class="text-xl font-black text-white" id="math-actual">153,064 actual kWh</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card overflow-hidden">
+                    <div class="bg-slate-50 border-b border-slate-100 p-8 flex justify-between items-center">
+                        <h2 class="text-base font-black text-slate-800 uppercase tracking-tight">Statement Details</h2>
+                        <div class="flex items-center gap-6">
+                            <div class="text-right">
+                                <p
+                                    class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1 text-right">
+                                    Pricing Tier</p>
+                                <span class="text-6xl font-black text-slate-900 italic block pricing-hero"
+                                    id="tierDisp">75%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-2 overflow-x-auto">
+                        <table class="meralco-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-left">Description</th>
+                                    <th>Base</th>
+                                    <th>Price (Editable)</th>
+                                    <th>Amount (PhP)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="section-header-row section-header-red">
+                                    <td colspan="3">Generation Charges</td>
+                                    <td id="det-gen-total">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Generation Energy Charge</td>
+                                    <td id="li-gen-base">--</td>
+                                    <td><input type="number" id="rate-gen" value="7.7471" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-gen-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Power Act Reduction (PAR)</td>
+                                    <td>--</td>
+                                    <td><input type="number" id="rate-par" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-par-amt">0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row section-header-red">
+                                    <td colspan="3">Transmission Charges</td>
+                                    <td id="det-trans-total">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Transmission Energy Charge</td>
+                                    <td id="li-trans-energy-base">--</td>
+                                    <td><input type="number" id="rate-trans-energy" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-trans-energy-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Transmission Demand Charge</td>
+                                    <td id="li-trans-base">--</td>
+                                    <td><input type="number" id="rate-trans" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-trans-amt">0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row section-header-red">
+                                    <td colspan="3">System Loss Charge</td>
+                                    <td id="det-sl-total">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>System Loss Charge</td>
+                                    <td id="li-sl-base">--</td>
+                                    <td><input type="number" id="rate-sl" value="0.6565" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-sl-amt">0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row section-header-blue">
+                                    <td colspan="3">Distribution Charges</td>
+                                    <td id="det-dist-total">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Distribution Energy Charge</td>
+                                    <td id="li-dist-energy-base">--</td>
+                                    <td><input type="number" id="rate-dist-energy" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-dist-energy-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Distribution Demand Charge</td>
+                                    <td id="li-dist-demand-base">--</td>
+                                    <td><input type="number" id="rate-dist-demand" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-dist-demand-amt">0.00</td>
+                                </tr>
+                                <tr class="hidden"> <!-- Hidden but logic-essential PF Adjustment -->
+                                    <td>Power Factor Adjustment</td>
+                                    <td id="li-dist-pf-base">--</td>
+                                    <td id="li-dist-pf-pct">--</td>
+                                    <td id="li-dist-pf-amt">0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row section-header-blue">
+                                    <td colspan="3">Supply Charges</td>
+                                    <td id="det-supply-total">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Supply Energy Charge</td>
+                                    <td id="li-supply-energy-base">--</td>
+                                    <td><input type="number" id="rate-supply-energy" value="0.4118" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-supply-energy-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Supply Retail Customer Charge</td>
+                                    <td>1.00 mo</td>
+                                    <td><input type="number" id="rate-supply" value="0.00" step="0.01"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td><span id="disp-supply">0.00</span></td>
+                                </tr>
+
+                                <tr class="section-header-row section-header-blue">
+                                    <td colspan="3">Metering Charges</td>
+                                    <td id="det-metering-total">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Metering Energy Charge</td>
+                                    <td id="li-metering-energy-base">--</td>
+                                    <td><input type="number" id="rate-metering-energy" value="0.6989" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-metering-energy-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Metering Retail Customer Charge</td>
+                                    <td>1.00 mo</td>
+                                    <td><input type="number" id="rate-metering" value="5.00" step="0.01"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td><span id="disp-metering">5.00</span></td>
+                                </tr>
+
+                                <tr class="section-header-row">
+                                    <td colspan="3">Loan Condonation</td>
+                                    <td id="li-loan-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Loan Condonation</td>
+                                    <td>--</td>
+                                    <td><input type="number" id="rate-loan" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td>0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row">
+                                    <td colspan="3">Inter-Class Cross Subsidy</td>
+                                    <td id="li-interclass-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Inter-Class Cross Subsidy</td>
+                                    <td>--</td>
+                                    <td><input type="number" id="rate-interclass" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td>0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row">
+                                    <td colspan="3">Other Charges</td>
+                                    <td id="det-other-total">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Lifeline Subsidy Charge</td>
+                                    <td id="li-life-base">--</td>
+                                    <td><input type="number" id="rate-life" value="0.0008" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-life-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Previous Power Cost Adjustment</td>
+                                    <td>--</td>
+                                    <td><input type="number" id="rate-prev-adj" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-prev-adj-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Sr. Citizen Subsidy Charge</td>
+                                    <td id="li-senior-base">--</td>
+                                    <td><input type="number" id="rate-senior" value="0.0001" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-senior-amt">0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row row-yellow-highlight"
+                                    style="border-top: 4px solid #2563eb;">
+                                    <td colspan="3">NPC/PSALM Adjustment</td>
+                                    <td id="det-npc-total">0.00</td>
+                                </tr>
+                                <tr class="row-yellow-highlight font-bold">
+                                    <td>Other Charges</td>
+                                    <td id="li-npc-other1-base">--</td>
+                                    <td><input type="number" id="rate-npc-other1" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-npc-other1-amt">0.00</td>
+                                </tr>
+                                <tr class="row-yellow-highlight font-bold">
+                                    <td>Other Charges</td>
+                                    <td id="li-npc-other2-base">--</td>
+                                    <td><input type="number" id="rate-npc-other2" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-npc-other2-amt">0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row">
+                                    <td colspan="3">Reinvestment Fund/MCC</td>
+                                    <td id="li-reinvest-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Reinvestment Fund/MCC</td>
+                                    <td id="li-reinvest-base">--</td>
+                                    <td><input type="number" id="rate-reinvest" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td>0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row">
+                                    <td colspan="3">Local Franchise Tax</td>
+                                    <td id="li-lft-amt-total">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Local Franchise Tax</td>
+                                    <td id="li-lft-base">--</td>
+                                    <td class="flex justify-end items-center gap-1"><input type="number" id="rate-lft"
+                                            value="0.75" step="0.0001" class="table-input pct-input"
+                                            oninput="calculateBill()"><span>%</span></td>
+                                    <td id="li-lft-amt">0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row">
+                                    <td colspan="3">Business Tax</td>
+                                    <td id="li-biz-tax-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>BusinessTax</td>
+                                    <td>--</td>
+                                    <td><input type="number" id="rate-biz-tax" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td>0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row">
+                                    <td colspan="3">Energy Tax</td>
+                                    <td id="li-energy-tax-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Energy Tax</td>
+                                    <td>--</td>
+                                    <td><input type="number" id="rate-energy-tax" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td>0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row">
+                                    <td colspan="3">Real Property Tax</td>
+                                    <td id="li-rpt-amt-total">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Real Property Tax</td>
+                                    <td id="li-rpt-base">--</td>
+                                    <td><input type="number" id="rate-rpt" value="0.0125" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-rpt-amt">0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row">
+                                    <td colspan="3">Universal Charge</td>
+                                    <td id="det-uc-total">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Missionary Electrification</td>
+                                    <td id="li-uc-spug-base">--</td>
+                                    <td><input type="number" id="rate-uc-spug" value="0.1949" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-uc-spug-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Environmental Charge</td>
+                                    <td id="li-uc-env-base">--</td>
+                                    <td><input type="number" id="rate-uc-env" value="0.0025" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-uc-env-amt">0.00</td>
+                                </tr>
+                                <tr class="row-yellow-highlight font-bold">
+                                    <td>NPC Stranded Contract Cost</td>
+                                    <td id="li-uc-scc-base">--</td>
+                                    <td><input type="number" id="rate-uc-scc" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-uc-scc-amt">0.00</td>
+                                </tr>
+                                <tr class="row-yellow-highlight font-bold">
+                                    <td>NPC Stranded Debts</td>
+                                    <td id="li-uc-sd-base">--</td>
+                                    <td><input type="number" id="rate-uc-sd" value="0.0428" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-uc-sd-amt">0.00</td>
+                                </tr>
+                                <tr class="row-yellow-highlight font-bold">
+                                    <td>Other Charges</td>
+                                    <td id="li-uc-other-base">--</td>
+                                    <td><input type="number" id="rate-uc-other" value="0.0000" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-uc-other-amt">0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row">
+                                    <td colspan="3">FIT Allowance</td>
+                                    <td id="det-fit-total">0.00</td>
+                                </tr>
+                                <tr class="row-yellow-highlight font-bold">
+                                    <td>Other Charges (FIT-All)</td>
+                                    <td id="li-fit-other1-base">--</td>
+                                    <td><input type="number" id="rate-fit" value="0.2073" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-fit-amt">0.00</td>
+                                </tr>
+                                <tr class="row-yellow-highlight font-bold">
+                                    <td>Other Charges (GEA-All)</td>
+                                    <td id="li-fit-other2-base">--</td>
+                                    <td><input type="number" id="rate-gea" value="0.0371" step="0.0001"
+                                            class="table-input" oninput="calculateBill()"></td>
+                                    <td id="li-fit-other2-amt">0.00</td>
+                                </tr>
+
+                                <tr class="section-header-row">
+                                    <td colspan="3">VAT</td>
+                                    <td id="det-vat-total">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Generation</td>
+                                    <td id="li-gen-vat-base">--</td>
+                                    <td class="flex justify-end items-center gap-1"><input type="number"
+                                            id="rate-gen-vat" value="11.13" step="0.01" class="table-input pct-input"
+                                            oninput="calculateBill()"><span>%</span></td>
+                                    <td id="li-gen-vat-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Transmission</td>
+                                    <td id="li-trans-vat-base">--</td>
+                                    <td class="flex justify-end items-center gap-1"><input type="number"
+                                            id="rate-trans-vat" value="12.00" step="0.01" class="table-input pct-input"
+                                            oninput="calculateBill()"><span>%</span></td>
+                                    <td id="li-trans-vat-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>System Loss</td>
+                                    <td id="li-sl-vat-base">--</td>
+                                    <td class="flex justify-end items-center gap-1"><input type="number"
+                                            id="rate-sl-vat" value="12.00" step="0.01" class="table-input pct-input"
+                                            oninput="calculateBill()"><span>%</span></td>
+                                    <td id="li-sl-vat-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Distribution</td>
+                                    <td id="li-dist-vat-base">--</td>
+                                    <td class="flex justify-end items-center gap-1"><input type="number"
+                                            id="rate-dist-vat" value="12.00" step="0.01" class="table-input pct-input"
+                                            oninput="calculateBill()"><span>%</span></td>
+                                    <td id="li-dist-vat-amt">0.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Others</td>
+                                    <td id="li-others-vat-base">--</td>
+                                    <td class="flex justify-end items-center gap-1"><input type="number"
+                                            id="rate-others-vat" value="0.00" step="0.01" class="table-input pct-input"
+                                            oninput="calculateBill()"><span>%</span></td>
+                                    <td id="li-others-vat-amt">0.00</td>
+                                </tr>
+
+                                <tr class="hidden"> <!-- Kept for logic compatibility -->
+                                    <td id="li-reg-base">--</td>
+                                    <td><input type="number" id="rate-reg" value="0"></td>
+                                    <td id="li-reg-amt">0.00</td>
+                                </tr>
+                                <tr class="hidden"> <!-- Kept for logic compatibility -->
+                                    <td id="li-awat-base">--</td>
+                                    <td><input type="number" id="rate-awat" value="0"></td>
+                                    <td id="li-awat-amt">0.00</td>
+                                </tr>
+
+                                <tr id="li-export-row" class="export-row-standard transition-all duration-300">
+                                    <td id="li-export-label" class="uppercase tracking-widest py-4 font-black">DER
+                                        Export Energy Credit</td>
+                                    <td id="li-export-base" class="py-4 font-bold">--</td>
+                                    <td id="li-export-price" class="py-4 font-bold">--</td>
+                                    <td id="det-der-credit" class="py-4 font-black text-emerald-800 text-lg">- 0.00</td>
+                                </tr>
+                                <tr id="li-excess-row"
+                                    class="hidden text-[10px] text-rose-600 font-bold bg-rose-50 border-t border-rose-100">
+                                    <td class="py-2">Surplus Export Volume (Beyond 30% Cap - Not Paid)</td>
+                                    <td id="li-excess-base" class="py-2">--</td>
+                                    <td class="py-2">0.0000</td>
+                                    <td class="py-2">0.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div
+                        class="bg-slate-900 p-8 text-white grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-white/10">
+                        <div class="space-y-1 opacity-80">
+                            <div class="flex justify-between text-[10px] font-black uppercase"><span>Gross Energy
+                                    Amount:</span> <span id="footer-gross">0.00</span></div>
+                            <div class="flex justify-between text-[10px] font-black uppercase text-emerald-400">
+                                <span>Applied Export Credit:</span> <span id="footer-export">- 0.00</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Final Net
+                                Amount Payable</p>
+                            <p class="text-5xl font-black tracking-tighter text-white" id="footer-total">₱ 0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: ANALYTICS & COMPARISON -->
+        <div id="tab-analytics-content" class="hidden space-y-6">
+            <!-- ROI PANEL -->
+            <div class="card p-8 border-t-4 border-blue-600">
+                <div class="flex flex-col md:flex-row justify-between gap-8">
+                    <div class="md:w-1/3 space-y-6">
+                        <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            ROI Calculator
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="input-group">
+                                <label>Investment per kWp (PhP)</label>
+                                <input type="number" id="roi-cost-kw" value="30000" oninput="calculateBill()"
+                                    class="input-premium">
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                <p class="text-[10px] font-black text-slate-400 uppercase">Total Estimated CAPEX</p>
+                                <p class="text-xl font-black text-slate-900" id="roi-total-capex">₱ 0.00</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div
+                            class="p-6 bg-blue-600 text-white rounded-3xl shadow-xl shadow-blue-100 flex flex-col justify-center">
+                            <p class="text-[10px] font-black uppercase opacity-60 mb-2">Monthly Cash Flow Benefit</p>
+                            <p class="text-4xl font-black" id="roi-monthly-savings">₱ 0.00</p>
+                            <p class="text-[10px] mt-4 opacity-80 font-medium">Monthly Savings vs Traditional Grid
+                                Billing.</p>
+                        </div>
+                        <div
+                            class="p-6 bg-emerald-50 border border-emerald-100 rounded-3xl flex flex-col justify-center text-center">
+                            <p class="text-[10px] font-black text-emerald-600 uppercase mb-2 tracking-[0.2em]">Simple
+                                Payback Period</p>
+                            <p class="text-5xl font-black text-emerald-900"><span id="roi-payback-val">0.0</span> <span
+                                    class="text-sm font-bold uppercase text-emerald-600">Years</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPARISON PANEL -->
+            <div class="card p-8 border-t-4 border-slate-900">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight">Scenario Comparison Dashboard
+                    </h3>
+                    <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 flex items-center gap-3">
+                        <label class="text-[10px] font-black text-slate-400 uppercase">PPA Rate (Developer
+                            Contract):</label>
+                        <input type="number" id="ppa-rate" value="4.50" step="0.1" oninput="calculateBill()"
+                            class="w-20 px-2 py-1 bg-white border border-blue-200 rounded text-xs font-bold text-blue-900 outline-none">
+                        <span class="text-[10px] font-bold text-slate-400">/kWh</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Scenario 1: Traditional -->
+                    <div class="p-6 rounded-3xl border border-slate-100 bg-white relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 9a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z">
+                                </path>
+                            </svg>
+                        </div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">A. Traditional
+                            Grid</p>
+                        <p class="text-4xl font-black text-slate-900 mb-6" id="comp-trad">₱ 0.00</p>
+                        <div class="space-y-3 pt-6 border-t border-slate-50">
+                            <div class="flex justify-between text-[11px] font-bold">
+                                <span class="text-slate-400 uppercase">Utility Pymt</span>
+                                <span class="text-slate-700" id="comp-trad-util">₱ 0.00</span>
+                            </div>
+                            <div class="flex justify-between text-[11px] font-bold">
+                                <span class="text-slate-400 uppercase">Solar Pymt</span>
+                                <span class="text-slate-300">N/A</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scenario 2: DER Exporting -->
+                    <div
+                        class="p-6 rounded-3xl border border-emerald-100 bg-emerald-50/50 relative overflow-hidden shadow-lg shadow-emerald-50 ring-2 ring-emerald-500 ring-offset-2">
+                        <div class="absolute top-0 right-0 p-4 opacity-10">
+                            <svg class="w-12 h-12 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM5.884 6.607a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414l-.707-.707a1 1 0 010-1.414zm9.9 0a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM3 11a1 1 0 100-2H2a1 1 0 100 2h1zm15 0a1 1 0 100-2h-1a1 1 0 100 2h1zM5.05 15.05a1 1 0 011.414 0l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 010-1.414zm9.9 0a1 1 0 010 1.414l-.707.707a1 1 0-1.414-1.414l.707-.707a1 1 0 010 1.414zM10 11a1 1 0 100-2 1 1 0 000 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        <p class="text-[10px] font-black text-emerald-600 uppercase mb-4 tracking-widest">B. DER
+                            Exporting (Current)</p>
+                        <p class="text-4xl font-black text-emerald-900 mb-6" id="comp-der-exp">₱ 0.00</p>
+                        <div class="space-y-3 pt-6 border-t border-emerald-100">
+                            <div class="flex justify-between text-[11px] font-bold">
+                                <span class="text-emerald-600 uppercase opacity-60">Utility Pymt</span>
+                                <span class="text-emerald-900" id="comp-der-exp-util">₱ 0.00</span>
+                            </div>
+                            <div class="flex justify-between text-[11px] font-bold">
+                                <span class="text-emerald-600 uppercase opacity-60">Solar Pymt</span>
+                                <span class="text-emerald-900">₱ 0.00 (Self-Owned)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scenario 3: DER Non-Exporting PPA -->
+                    <div class="p-6 rounded-3xl border border-blue-100 bg-blue-50/50 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10">
+                            <svg class="w-12 h-12 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6h10v6H6v-6z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <p class="text-[10px] font-black text-blue-600 uppercase mb-4 tracking-widest">C. Non-Exporting
+                            (PPA)</p>
+                        <p class="text-4xl font-black text-blue-900 mb-6" id="comp-der-ppa">₱ 0.00</p>
+                        <div class="space-y-3 pt-6 border-t border-blue-100">
+                            <div class="flex justify-between text-[11px] font-bold">
+                                <span class="text-blue-600 uppercase opacity-60">Utility Pymt</span>
+                                <span class="text-blue-900" id="comp-der-ppa-util">₱ 0.00</span>
+                            </div>
+                            <div class="flex justify-between text-[11px] font-bold">
+                                <span class="text-blue-600 uppercase opacity-60">Developer Pymt</span>
+                                <span class="text-blue-900 font-black" id="comp-der-ppa-contract">₱ 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: GOVERNANCE -->
+        <div id="tab-flow-content" class="hidden space-y-6">
+            <div class="card p-10 bg-white border-t-4 border-slate-900 shadow-xl relative overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
+
+                    <!-- LEFT COLUMN: REGULATORY & PRICING -->
+                    <div class="space-y-8">
+                        <!-- SECTION 1 -->
+                        <div class="gov-card bg-slate-50 border-slate-200">
+                            <h3 class="gov-title text-blue-700">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3">
+                                    </path>
+                                </svg>
+                                1. Legal Basis & Scope
+                            </h3>
+                            <p class="gov-text">
+                                The <strong>Distributed Energy Resources (DER) Rules</strong> (ERC Resolution No. 11,
+                                Series of 2022) govern the integration of renewable energy sources into the distribution
+                                system. This specifically covers technologies (like Solar PV) that are:
+                            </p>
+                            <ul class="gov-list">
+                                <li><strong>Capacity:</strong> Greater than 100kW but not exceeding 1MW (Exporting).
+                                </li>
+                                <li><strong>Connection:</strong> Connected to the Distribution Utility (DU) system.</li>
+                                <li><strong>Purpose:</strong> Primarily for self-generation with the option to export
+                                    excess energy.</li>
+                            </ul>
+                            <div class="mt-4 p-3 bg-white border border-slate-200 rounded-lg">
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+                                    Distinction from Net-Metering</p>
+                                <p class="text-[11px] text-slate-800 font-medium">Net-Metering is strictly for systems <
+                                        100kW. DER Rules apply to larger commercial/industrial capacities (100kW-1MW),
+                                        utilizing a "Net-Billing" scheme rather than kWh banking.</p>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2 -->
+                        <div class="gov-card">
+                            <h3 class="gov-title text-emerald-700">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                                    </path>
+                                </svg>
+                                2. Commercial & Compensation
+                            </h3>
+                            <p class="gov-text">
+                                Compensation for exported energy is monetary (Pesos), not energy credits. The value is
+                                calculated based on the DU's <strong>Blended Generation Rate</strong>.
+                            </p>
+
+                            <div class="grid grid-cols-2 gap-4 mt-6">
+                                <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-lg text-center">
+                                    <p class="text-[10px] font-black text-emerald-600 uppercase mb-1">Tier 1 (100-500kW)
+                                    </p>
+                                    <p class="text-3xl font-black text-emerald-800">75%</p>
+                                    <p class="text-[9px] text-emerald-600 font-medium leading-tight mt-1">of Blended Gen
+                                        Rate</p>
+                                </div>
+                                <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-lg text-center">
+                                    <p class="text-[10px] font-black text-emerald-600 uppercase mb-1">Tier 2 (500kW-1MW)
+                                    </p>
+                                    <p class="text-3xl font-black text-emerald-800">60%</p>
+                                    <p class="text-[9px] text-emerald-600 font-medium leading-tight mt-1">of Blended Gen
+                                        Rate</p>
+                                </div>
+                            </div>
+
+                            <div class="advisory-box mt-4">
+                                <h5
+                                    class="text-[10px] font-black text-amber-900 uppercase mb-1 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                        </path>
+                                    </svg>
+                                    30% Export Cap Rule
+                                </h5>
+                                <p class="text-[10px] text-amber-800 leading-relaxed font-medium">The DU is only
+                                    obligated to pay for exports up to <strong>30%</strong> of the facility's Nameplate
+                                    Capacity. Any export beyond this threshold is deemed "Gratuitous Energy" and is not
+                                    compensated.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: TECHNICAL & ROADMAP -->
+                    <div class="space-y-8">
+                        <!-- SECTION 3 -->
+                        <div class="gov-card">
+                            <h3 class="gov-title text-slate-700">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                                    </path>
+                                </svg>
+                                3. Technical Requirements
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="permit-item border-l-4 border-blue-500 bg-blue-50/30 p-4 rounded-r-lg mb-0">
+                                    <h4 class="text-[11px] font-black text-blue-800 uppercase mb-2">Mandatory REC
+                                        Metering</h4>
+                                    <p class="text-[10px] text-slate-600 leading-relaxed">
+                                        Unlike Net-Metering (which uses a single bi-directional meter), DER requires a
+                                        secondary <strong>REC Meter</strong> to measure the <em>total gross
+                                            generation</em> of the RE system. This data is used for Renewable Portfolio
+                                        Standards (RPS) compliance. <strong>Note: No DSM charges shall be applied for
+                                            the REC meter.</strong>
+                                    </p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                                        <span class="block text-[9px] font-black text-slate-400 uppercase mb-1">System
+                                            Limit</span>
+                                        <span class="block text-xs font-bold text-slate-800">1000 kWp</span>
+                                    </div>
+                                    <div class="p-3 bg-slate-50 rounded border border-slate-200">
+                                        <span class="block text-[9px] font-black text-slate-400 uppercase mb-1">Impact
+                                            Study</span>
+                                        <span class="block text-xs font-bold text-slate-800">Required (DIS)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 4: EXPANDED ROADMAP -->
+                        <div class="gov-card border-l-4 border-slate-800">
+                            <h3 class="gov-title text-slate-900">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                                    </path>
+                                </svg>
+                                4. 60-Day Implementation Roadmap
+                            </h3>
+                            <div class="ml-2 mt-6">
+                                <div class="roadmap-step border-slate-300 pb-6">
+                                    <div
+                                        class="absolute -left-[19px] top-0 bg-white p-1 rounded-full border-2 border-slate-300">
+                                        <div class="w-2 h-2 bg-slate-400 rounded-full"></div>
+                                    </div>
+                                    <p class="text-[11px] font-black text-slate-900 uppercase mb-1">Phase 1: Application
+                                        (Day 1-15)</p>
+                                    <p class="text-[10px] text-slate-500">Submission of Letter of Intent (LOI) and
+                                        single-line diagram to the DU. Payment of application fee for Distribution
+                                        Impact Study (DIS).</p>
+                                </div>
+
+                                <div class="roadmap-step border-blue-400 pb-6">
+                                    <div
+                                        class="absolute -left-[19px] top-0 bg-white p-1 rounded-full border-2 border-blue-500">
+                                        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    </div>
+                                    <p class="text-[11px] font-black text-blue-700 uppercase mb-1">Phase 2: Technical
+                                        Assessment (Day 16-30)</p>
+                                    <p class="text-[10px] text-slate-500">Conduct of DIS by the utility to check grid
+                                        loading. Issuance of impact results and technical requirements for
+                                        interconnection.</p>
+                                </div>
+
+                                <div class="roadmap-step border-emerald-400 pb-6">
+                                    <div
+                                        class="absolute -left-[19px] top-0 bg-white p-1 rounded-full border-2 border-emerald-500">
+                                        <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                    </div>
+                                    <p class="text-[11px] font-black text-emerald-700 uppercase mb-1">Phase 3:
+                                        Installation & Testing (Day 31-50)</p>
+                                    <p class="text-[10px] text-slate-500">Physical installation of PV system and REC
+                                        meter socket. Pre-commissioning tests and safety inspection by Local Government
+                                        (Electrical Permit).</p>
+                                </div>
+
+                                <div class="roadmap-step border-transparent pb-0">
+                                    <div
+                                        class="absolute -left-[19px] top-0 bg-emerald-600 p-1.5 rounded-full shadow-lg shadow-emerald-200">
+                                        <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="text-[11px] font-black text-slate-900 uppercase mb-1">Phase 4: COC &
+                                        Switch-On (Day 51-60)</p>
+                                    <p class="text-[10px] text-slate-500">ERC issuance of Certificate of Compliance
+                                        (COC). DU installs meters and issues Permit to Operate (PTO). <strong>Commercial
+                                            Operations Begin.</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const formatNumber = (num) => (num || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const setUI = (id, text) => { const el = document.getElementById(id); if (el) el.innerText = text; };
+
+        function switchTab(view) {
+            const bill = document.getElementById('tab-bill-content');
+            const flow = document.getElementById('tab-flow-content');
+            const analytics = document.getElementById('tab-analytics-content');
+            const btns = ['btn-bill', 'btn-flow', 'btn-analytics'];
+
+            if (bill) bill.classList.toggle('hidden', view !== 'bill');
+            if (flow) flow.classList.toggle('hidden', view !== 'flow');
+            if (analytics) analytics.classList.toggle('hidden', view !== 'analytics');
+
+            btns.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.className = (id === 'btn-' + view) ? "tab-btn active" : "tab-btn text-slate-500";
+            });
+        }
+
+        function validateAndCalculate() {
+            const el = document.getElementById('derCapacityKWp');
+            const warn = document.getElementById('cap-warning');
+
+            if (parseFloat(el.value) > 1000) {
+                el.value = 1000;
+                el.classList.add('border-red-500', 'text-red-600');
+                if (warn) warn.classList.remove('hidden');
+            } else {
+                el.classList.remove('border-red-500', 'text-red-600');
+                if (warn) warn.classList.add('hidden');
+            }
+            calculateBill();
+        }
+
+        const VECO_RATES = {
+            'General Service': { gen: 6.5162, trans: 1.8822, transD: 0, sl: 0.6565, distE: 1.7495, distD: 0, supplyE: 0.4118, supplyF: 0, meteringE: 0.6989, meteringF: 5.00, lft: 0.75, rpt: 0.0125, ucSpug: 0.1993, ucEnv: 0.0025, ucSd: 0.0428, life: 0.0005, senior: 0.0002 },
+            'General Power': { gen: 6.5162, trans: 1.9080, transD: 0, sl: 0.6585, distE: 1.3681, distD: 0, supplyE: 0, supplyF: 460.54, meteringE: 0, meteringF: 525.08, lft: 0.75, rpt: 0.0125, ucSpug: 0.1993, ucEnv: 0.0025, ucSd: 0.0428, life: 0.0005, senior: 0.0002 }
+        };
+
+        function selectType(type) {
+            const r = VECO_RATES[type];
+            document.getElementById('rate-gen').value = r.gen;
+            document.getElementById('rate-par').value = 0; // Initialize new fields to 0
+            document.getElementById('rate-trans').value = r.transD;
+            document.getElementById('rate-trans-energy').value = r.trans;
+            document.getElementById('rate-sl').value = r.sl;
+            document.getElementById('rate-dist-demand').value = r.distD;
+            document.getElementById('rate-dist-energy').value = r.distE;
+            document.getElementById('rate-supply').value = r.supplyF;
+            document.getElementById('rate-supply-energy').value = r.supplyE;
+            document.getElementById('rate-metering').value = r.meteringF;
+            document.getElementById('rate-metering-energy').value = r.meteringE;
+
+            document.getElementById('rate-loan').value = 0;
+            document.getElementById('rate-interclass').value = 0;
+            document.getElementById('rate-prev-adj').value = 0;
+            document.getElementById('rate-npc-other1').value = 0;
+            document.getElementById('rate-npc-other2').value = 0;
+            document.getElementById('rate-reinvest').value = 0;
+            document.getElementById('rate-biz-tax').value = 0;
+            document.getElementById('rate-energy-tax').value = 0;
+            document.getElementById('rate-uc-scc').value = 0;
+            document.getElementById('rate-uc-other').value = 0;
+            document.getElementById('rate-fit').value = 0.2073;
+            document.getElementById('rate-gea').value = 0.0371;
+            document.getElementById('rate-others-vat').value = 0;
+
+            document.getElementById('rate-lft').value = r.lft;
+            document.getElementById('rate-rpt').value = r.rpt;
+            document.getElementById('rate-uc-spug').value = r.ucSpug;
+            document.getElementById('rate-uc-env').value = r.ucEnv;
+            document.getElementById('rate-uc-sd').value = r.ucSd;
+            document.getElementById('rate-life').value = r.life;
+            document.getElementById('rate-senior').value = r.senior;
+
+            // Updated VAT Defaults based on Dec 2025 PDF derived percentages
+            document.getElementById('rate-gen-vat').value = 10.42;
+            document.getElementById('rate-trans-vat').value = (r.trans > 0 ? (0.11046855 / r.trans * 100).toFixed(2) : 12.00);
+            document.getElementById('rate-sl-vat').value = (r.sl > 0 ? (0.0692 / r.sl * 100).toFixed(2) : 12.00);
+            document.getElementById('rate-dist-vat').value = 12.00;
+
+            document.getElementById('selection-modal').classList.add('hidden');
+            document.getElementById('modal-close-btn').classList.remove('hidden');
+            document.getElementById('client-type-label').innerText = type + " - Active";
+            calculateBill();
+        }
+
+        function calculateBill() {
+            // Helper to get rate from input
+            const getR = (id) => parseFloat(document.getElementById(id).value) || 0;
+
+            // Updated Rates (Fetched from UI inputs)
+            const rates = {
+                gen: getR('rate-gen'),
+                par: getR('rate-par'),
+                genVat: getR('rate-gen-vat') / 100,
+                transD: getR('rate-trans'),
+                transE: getR('rate-trans-energy'),
+                transVat: getR('rate-trans-vat') / 100,
+                sl: getR('rate-sl'),
+                slVat: getR('rate-sl-vat') / 100,
+                distDemand: getR('rate-dist-demand'),
+                distEnergy: getR('rate-dist-energy'),
+                supplyF: getR('rate-supply'),
+                supplyE: getR('rate-supply-energy'),
+                meteringF: getR('rate-metering'),
+                meteringE: getR('rate-metering-energy'),
+                distVat: getR('rate-dist-vat') / 100,
+                loan: getR('rate-loan'),
+                interclass: getR('rate-interclass'),
+                life: getR('rate-life'),
+                prevAdj: getR('rate-prev-adj'),
+                senior: getR('rate-senior'),
+                npcOther1: getR('rate-npc-other1'),
+                npcOther2: getR('rate-npc-other2'),
+                reinvest: getR('rate-reinvest'),
+                lft: getR('rate-lft') / 100,
+                bizTax: getR('rate-biz-tax'),
+                energyTax: getR('rate-energy-tax'),
+                rpt: getR('rate-rpt'),
+                ucSpug: getR('rate-uc-spug'),
+                ucEnv: getR('rate-uc-env'),
+                ucScc: getR('rate-uc-scc'),
+                ucSd: getR('rate-uc-sd'),
+                ucOther: getR('rate-uc-other'),
+                fit: getR('rate-fit'),
+                gea: getR('rate-gea'),
+                othersVat: getR('rate-others-vat') / 100,
+                reg: getR('rate-reg'),
+                awat: getR('rate-awat')
+            };
+
+            const derKWp = getR('derCapacityKWp');
+            const cf = getR('capacityFactor');
+            const importKwh = getR('importKwh');
+            const exportKwh = getR('exportKwh');
+            const demandKw = getR('demandKw');
+            const pfInput = getR('powerFactor');
+            const investPerKw = getR('roi-cost-kw');
+            const ppaRate = getR('ppa-rate');
+
+            const solarKw = derKWp;
+            const solarGen = solarKw * 24 * 31 * (cf / 100);
+            const exportLimit = solarGen * 0.3;
+            const isCapped = exportKwh > exportLimit;
+            const compExport = isCapped ? exportLimit : exportKwh;
+            const actualConsumption = Math.max(0, importKwh - exportKwh + solarGen);
+
+            // Calculations
+            const genAmt = importKwh * (rates.gen + rates.par);
+            const genVat = genAmt * rates.genVat;
+
+            const transAmt = (demandKw * rates.transD) + (importKwh * rates.transE);
+            const transVat = transAmt * rates.transVat;
+
+            const slAmt = importKwh * rates.sl;
+            const slVat = slAmt * rates.slVat;
+
+            const distBase = (demandKw * rates.distDemand) + (importKwh * rates.distEnergy) + rates.supplyF + rates.meteringF + (importKwh * rates.supplyE) + (importKwh * rates.meteringE);
+            const pfFact = (pfInput >= 95) ? (0.95 / (pfInput / 100) - 1) : 0;
+            const pfAdj = distBase * pfFact;
+            const distTotalWithPf = distBase + pfAdj;
+            const distVat = distTotalWithPf * rates.distVat;
+
+            const loanAmt = importKwh * rates.loan;
+            const interclassAmt = importKwh * rates.interclass;
+            const otherChargesTotal = importKwh * (rates.life + rates.prevAdj + rates.senior);
+            const npcTotal = importKwh * (rates.npcOther1 + rates.npcOther2);
+            const reinvestAmt = importKwh * rates.reinvest;
+            const lftAmt = (genAmt + transAmt + slAmt + distTotalWithPf) * rates.lft;
+            const bizTaxAmt = importKwh * rates.bizTax;
+            const energyTaxAmt = importKwh * rates.energyTax;
+            const rptAmt = importKwh * rates.rpt;
+
+            const ucTotal = importKwh * (rates.ucSpug + rates.ucEnv + rates.ucScc + rates.ucSd + rates.ucOther);
+            const fitTotal = actualConsumption * (rates.fit + rates.gea);
+
+            const vatableOthers = loanAmt + interclassAmt + otherChargesTotal + npcTotal + reinvestAmt + lftAmt + bizTaxAmt + energyTaxAmt + rptAmt;
+            const othersVatAmt = vatableOthers * rates.othersVat;
+            const totalVat = genVat + transVat + slVat + distVat + othersVatAmt;
+
+            const grossBill = genAmt + transAmt + slAmt + distTotalWithPf + vatableOthers + ucTotal + fitTotal + totalVat;
+
+            let derMult = (solarKw > 499.99) ? 0.60 : 0.75;
+            const exportPrice = 6.2363 * derMult;
+            const derCredit = compExport * exportPrice;
+            const netAmount = Math.max(0, grossBill - derCredit);
+
+            // ROI Logic - Full Traditional Comparison
+            const tradVolume = importKwh + Math.max(0, solarGen - exportKwh);
+            const tradGen = tradVolume * (rates.gen + rates.par);
+            const tradTrans = (demandKw * rates.transD) + (tradVolume * rates.transE);
+            const tradSl = tradVolume * rates.sl;
+            const tradDistBase = (demandKw * rates.distDemand) + (tradVolume * rates.distEnergy) + rates.supplyF + rates.meteringF + (tradVolume * rates.supplyE) + (tradVolume * rates.meteringE);
+            const tradDistWithPf = tradDistBase * (1 + pfFact);
+            const tradAdjustments = (tradVolume * (rates.loan + rates.interclass + rates.life + rates.prevAdj + rates.senior + rates.npcOther1 + rates.npcOther2 + rates.reinvest + rates.bizTax + rates.energyTax + rates.rpt)) + ((tradGen + tradTrans + tradSl + tradDistWithPf) * rates.lft);
+            const tradUc = tradVolume * (rates.ucSpug + rates.ucEnv + rates.ucScc + rates.ucSd + rates.ucOther);
+            const tradFit = tradVolume * (rates.fit + rates.gea);
+            const tradVat = (tradGen * rates.genVat) + (tradTrans * rates.transVat) + (tradSl * rates.slVat) + (tradDistWithPf * rates.distVat) + (tradAdjustments * rates.othersVat);
+            const traditionalTotal = tradGen + tradTrans + tradSl + tradDistWithPf + tradAdjustments + tradUc + tradFit + tradVat;
+
+            // UI Updates
+            setUI('math-import', importKwh.toLocaleString());
+            setUI('math-export', exportKwh.toLocaleString());
+            setUI('math-gen', Math.round(solarGen).toLocaleString());
+            setUI('math-actual', Math.round(actualConsumption).toLocaleString() + " actual kWh");
+            setUI('sideTotal', "₱ " + formatNumber(netAmount));
+            setUI('label-export-limit', `Limit: ${Math.round(exportLimit).toLocaleString()} kWh`);
+            setUI('tierDisp', (solarKw > 500 ? "60%" : "75%"));
+
+            setUI('li-gen-base', importKwh.toLocaleString() + " kWh"); setUI('li-gen-amt', formatNumber(importKwh * rates.gen)); setUI('li-par-amt', formatNumber(importKwh * rates.par)); setUI('det-gen-total', formatNumber(genAmt));
+            setUI('li-trans-energy-base', importKwh.toLocaleString() + " kWh"); setUI('li-trans-energy-amt', formatNumber(importKwh * rates.transE)); setUI('li-trans-base', demandKw.toLocaleString() + " kW"); setUI('li-trans-amt', formatNumber(demandKw * rates.transD)); setUI('det-trans-total', formatNumber(transAmt));
+            setUI('li-sl-base', importKwh.toLocaleString() + " kWh"); setUI('li-sl-amt', formatNumber(slAmt)); setUI('det-sl-total', formatNumber(slAmt));
+            setUI('li-dist-energy-base', importKwh.toLocaleString() + " kWh"); setUI('li-dist-energy-amt', formatNumber(importKwh * rates.distEnergy)); setUI('li-dist-demand-base', demandKw.toLocaleString() + " kW"); setUI('li-dist-demand-amt', formatNumber(demandKw * rates.distDemand)); setUI('li-dist-pf-base', formatNumber(distBase)); setUI('li-dist-pf-pct', (pfFact * 100).toFixed(2) + "%"); setUI('li-dist-pf-amt', formatNumber(pfAdj)); setUI('det-dist-total', formatNumber(distTotalWithPf));
+            setUI('disp-supply', formatNumber(rates.supplyF)); setUI('disp-metering', formatNumber(rates.meteringF)); setUI('li-supply-energy-base', importKwh.toLocaleString() + " kWh"); setUI('li-supply-energy-amt', formatNumber(importKwh * rates.supplyE)); setUI('det-supply-total', formatNumber(importKwh * rates.supplyE + rates.supplyF));
+            setUI('li-metering-energy-base', importKwh.toLocaleString() + " kWh"); setUI('li-metering-energy-amt', formatNumber(importKwh * rates.meteringE)); setUI('det-metering-total', formatNumber(importKwh * rates.meteringE + rates.meteringF));
+            setUI('li-loan-amt', formatNumber(loanAmt)); setUI('li-interclass-amt', formatNumber(interclassAmt)); setUI('li-life-base', importKwh.toLocaleString() + " kWh"); setUI('li-life-amt', formatNumber(importKwh * rates.life)); setUI('li-prev-adj-amt', formatNumber(importKwh * rates.prevAdj)); setUI('li-senior-base', importKwh.toLocaleString() + " kWh"); setUI('li-senior-amt', formatNumber(importKwh * rates.senior)); setUI('det-other-total', formatNumber(otherChargesTotal));
+            setUI('li-npc-other1-base', importKwh.toLocaleString() + " kWh"); setUI('li-npc-other1-amt', formatNumber(importKwh * rates.npcOther1)); setUI('li-npc-other2-base', importKwh.toLocaleString() + " kWh"); setUI('li-npc-other2-amt', formatNumber(importKwh * rates.npcOther2)); setUI('det-npc-total', formatNumber(npcTotal));
+            setUI('li-reinvest-base', importKwh.toLocaleString() + " kWh"); setUI('li-reinvest-amt', formatNumber(reinvestAmt));
+            setUI('li-lft-base', formatNumber(genAmt + transAmt + slAmt + distTotalWithPf)); setUI('li-lft-amt', formatNumber(lftAmt)); setUI('li-lft-amt-total', formatNumber(lftAmt)); setUI('li-biz-tax-amt', formatNumber(bizTaxAmt)); setUI('li-energy-tax-amt', formatNumber(energyTaxAmt));
+            setUI('li-rpt-base', importKwh.toLocaleString() + " kWh"); setUI('li-rpt-amt', formatNumber(rptAmt)); setUI('li-rpt-amt-total', formatNumber(rptAmt));
+            setUI('li-uc-spug-base', importKwh.toLocaleString() + " kWh"); setUI('li-uc-spug-amt', formatNumber(importKwh * rates.ucSpug)); setUI('li-uc-env-base', importKwh.toLocaleString() + " kWh"); setUI('li-uc-env-amt', formatNumber(importKwh * rates.ucEnv)); setUI('li-uc-scc-base', importKwh.toLocaleString() + " kWh"); setUI('li-uc-scc-amt', formatNumber(importKwh * rates.ucScc)); setUI('li-uc-sd-base', importKwh.toLocaleString() + " kWh"); setUI('li-uc-sd-amt', formatNumber(importKwh * rates.ucSd)); setUI('li-uc-other-base', importKwh.toLocaleString() + " kWh"); setUI('li-uc-other-amt', formatNumber(importKwh * rates.ucOther)); setUI('det-uc-total', formatNumber(ucTotal));
+
+            const actLab = Math.round(actualConsumption).toLocaleString() + " actual kWh";
+            setUI('li-fit-other1-base', actLab); setUI('li-fit-amt', formatNumber(actualConsumption * rates.fit)); setUI('li-fit-other2-base', actLab); setUI('li-fit-other2-amt', formatNumber(actualConsumption * rates.gea)); setUI('det-fit-total', formatNumber(fitTotal));
+
+            setUI('li-gen-vat-base', formatNumber(genAmt)); setUI('li-gen-vat-amt', formatNumber(genVat));
+            setUI('li-trans-vat-base', formatNumber(transAmt)); setUI('li-trans-vat-amt', formatNumber(transVat));
+            setUI('li-sl-vat-base', formatNumber(slAmt)); setUI('li-sl-vat-amt', formatNumber(slVat));
+            setUI('li-dist-vat-base', formatNumber(distTotalWithPf)); setUI('li-dist-vat-amt', formatNumber(distVat));
+            setUI('li-others-vat-base', formatNumber(vatableOthers)); setUI('li-others-vat-amt', formatNumber(othersVatAmt));
+            setUI('det-vat-total', formatNumber(totalVat));
+
+            setUI('li-export-base', compExport.toLocaleString() + " kWh");
+            setUI('li-export-price', exportPrice.toFixed(4));
+            setUI('det-der-credit', "- " + formatNumber(derCredit));
+
+            setUI('footer-gross', formatNumber(grossBill));
+            setUI('footer-export', "- " + formatNumber(derCredit));
+            setUI('footer-total', "₱ " + formatNumber(netAmount));
+
+            // ROI logic
+            const totalCapex = solarKw * investPerKw;
+            const monthlySavings = traditionalTotal - netAmount;
+            const paybackYears = monthlySavings > 0 ? (totalCapex / (monthlySavings * 12)) : 0;
+            setUI('roi-total-capex', "₱ " + formatNumber(totalCapex));
+            setUI('roi-monthly-savings', "₱ " + formatNumber(monthlySavings));
+            setUI('roi-payback-val', paybackYears.toFixed(1));
+
+            setUI('comp-trad', "₱ " + formatNumber(traditionalTotal));
+            setUI('comp-trad-util', "₱ " + formatNumber(traditionalTotal));
+            setUI('comp-der-exp', "₱ " + formatNumber(netAmount));
+            setUI('comp-der-exp-util', "₱ " + formatNumber(netAmount));
+
+            const ppaUtilPymt = (importKwh * (rates.gen + rates.par) * (1 + rates.genVat)) + (((demandKw * rates.transD) + (importKwh * rates.transE)) * (1 + rates.transVat)) + ((importKwh * rates.sl) * (1 + rates.slVat)) + (distTotalWithPf * (1 + rates.distVat)) + (vatableOthers * (1 + rates.othersVat)) + ucTotal + fitTotal;
+            const ppaContractPymt = solarGen * ppaRate;
+            setUI('comp-der-ppa', "₱ " + formatNumber(ppaUtilPymt + ppaContractPymt));
+            setUI('comp-der-ppa-util', "₱ " + formatNumber(ppaUtilPymt));
+            setUI('comp-der-ppa-contract', "₱ " + formatNumber(ppaContractPymt));
+
+            const badgeEl = document.getElementById('sideRejectionBadge');
+            const exportRow = document.getElementById('li-export-row');
+            const excessRow = document.getElementById('li-excess-row');
+
+            if (isCapped) {
+                if (badgeEl) badgeEl.classList.remove('hidden');
+                if (exportRow) exportRow.className = "rejected-overlay transition-all duration-300";
+                if (excessRow) excessRow.classList.remove('hidden');
+                setUI('li-export-label', 'DER EXPORT CREDIT (CAPPED @ 30%)');
+                setUI('li-excess-base', formatNumber(exportKwh - exportLimit).split('.')[0] + " kWh");
+            } else {
+                if (badgeEl) badgeEl.classList.add('hidden');
+                if (exportRow) exportRow.className = "export-row-standard transition-all duration-300";
+                if (excessRow) excessRow.classList.add('hidden');
+                setUI('li-export-label', 'DER EXPORT ENERGY CREDIT');
+            }
+        }
+
+        window.onload = () => {
+            // Wait for user to select from modal
+        };
+    </script>
+</body>
+
+</html>
